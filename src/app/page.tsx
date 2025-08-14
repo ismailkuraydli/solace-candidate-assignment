@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Advocate } from "@/types/advocate";
+import { isStringAnInteger } from "@/lib/helpers";
 
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
@@ -31,7 +32,9 @@ export default function Home() {
         advocate.city.includes(searchTerm) ||
         advocate.degree.includes(searchTerm) ||
         advocate.specialties.includes(searchTerm) ||
-        advocate.yearsOfExperience.includes(searchTerm)
+        (isStringAnInteger(searchTerm)
+          ? advocate.yearsOfExperience === parseInt(searchTerm)
+          : false)
       );
     });
 
