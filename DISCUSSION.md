@@ -7,3 +7,7 @@ Since advocates might be a very large number we would need to implement limits a
 # Update Next version to latest
 
 The Next.js version should be updated to 15, errors were showing nextjs 14 is outdated.
+
+# UI could still use a lot of work 
+
+UI still needs a lot of work to resemble the main page of Solace including the Gold color in button using the same font etc.
