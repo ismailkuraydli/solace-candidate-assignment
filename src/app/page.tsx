@@ -3,23 +3,33 @@
 import { useEffect, useState } from "react";
 import { Advocate } from "@/types/advocate";
 import { isStringAnInteger } from "@/lib/helpers";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
   const [filteredAdvocates, setFilteredAdvocates] = useState<Advocate[]>([]);
-
+  const router = useRouter();
   useEffect(() => {
-    console.log("fetching advocates...");
-    fetch("/api/advocates").then((response) => {
-      response.json().then((jsonResponse: { data: Advocate[] }) => {
-        const { data } = jsonResponse;
-        setAdvocates(data);
-        setFilteredAdvocates(data);
+    fetch("/api/advocates")
+      .then((response) => {
+        if (!response.ok && response.status === 500) {
+          router.push("/500");
+          return;
+        }
+        response.json().then((jsonResponse: { data: Advocate[] }) => {
+          const { data } = jsonResponse;
+          setAdvocates(data);
+          setFilteredAdvocates(data);
+        });
+      })
+      .catch((error) => {
+        // We should not have console errors show especially for 500s this should be logged using datadog/sentry 
+        console.error("Error fetching advocates:", error);
+        router.push("/500");
       });
-    });
   }, []);
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement >) => {
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchTerm = e.target.value;
 
     const filteredAdvocates = advocates.filter((advocate) => {
@@ -78,7 +88,7 @@ export default function Home() {
                 <td>{advocate.city}</td>
                 <td>{advocate.degree}</td>
                 <td>
-                  {advocate.specialties.map((s:string, index:number) => (
+                  {advocate.specialties.map((s: string, index: number) => (
                     <div key={`${advocate.id}-${index}`}>{s}</div>
                   ))}
                 </td>
