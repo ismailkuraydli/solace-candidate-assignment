@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const [advocates, setAdvocates] = useState<Advocate[]>([]);
   const [filteredAdvocates, setFilteredAdvocates] = useState<Advocate[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
   const router = useRouter();
   useEffect(() => {
     fetch("/api/advocates")
@@ -23,34 +25,34 @@ export default function Home() {
         });
       })
       .catch((error) => {
-        // We should not have console errors show especially for 500s this should be logged using datadog/sentry 
+        // We should not have console errors show especially for 500s this should be logged using datadog/sentry
         console.error("Error fetching advocates:", error);
         router.push("/500");
       });
   }, []);
 
+  useEffect(() => {
+    filterAdvocates();
+  }, [searchTerm]);
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const searchTerm = e.target.value;
+    setSearchTerm(e.target.value.toLowerCase().trim());
+  };
 
+  function filterAdvocates() {
     const filteredAdvocates = advocates.filter((advocate) => {
       return (
-        advocate.firstName.includes(searchTerm) ||
-        advocate.lastName.includes(searchTerm) ||
-        advocate.city.includes(searchTerm) ||
-        advocate.degree.includes(searchTerm) ||
+        advocate.firstName.toLowerCase().includes(searchTerm) ||
+        advocate.lastName.toLowerCase().includes(searchTerm) ||
+        advocate.city.toLowerCase().includes(searchTerm) ||
+        advocate.degree.toLowerCase().includes(searchTerm) ||
         advocate.specialties.includes(searchTerm) ||
         (isStringAnInteger(searchTerm)
           ? advocate.yearsOfExperience === parseInt(searchTerm)
           : false)
       );
     });
-
     setFilteredAdvocates(filteredAdvocates);
-  };
-
-  const onClick = () => {
-    setFilteredAdvocates(advocates);
-  };
+  }
 
   return (
     <main style={{ margin: "24px" }}>
@@ -63,7 +65,7 @@ export default function Home() {
           Searching for: <span id="search-term"></span>
         </p>
         <input style={{ border: "1px solid black" }} onChange={onChange} />
-        <button onClick={onClick}>Reset Search</button>
+        <button onClick={() => setSearchTerm("")}>Reset Search</button>
       </div>
       <br />
       <br />
