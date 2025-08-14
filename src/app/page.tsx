@@ -13,8 +13,8 @@ export default function Home() {
     fetch("/api/advocates").then((response) => {
       response.json().then((jsonResponse: { data: Advocate[] }) => {
         const { data } = jsonResponse;
-        setAdvocates(jsonResponse.data);
-        setFilteredAdvocates(jsonResponse.data);
+        setAdvocates(data);
+        setFilteredAdvocates(data);
       });
     });
   }, []);
@@ -72,14 +72,14 @@ export default function Home() {
         <tbody>
           {filteredAdvocates.map((advocate) => {
             return (
-              <tr>
+              <tr key={`${advocate.id}`}>
                 <td>{advocate.firstName}</td>
                 <td>{advocate.lastName}</td>
                 <td>{advocate.city}</td>
                 <td>{advocate.degree}</td>
                 <td>
-                  {advocate.specialties.map((s) => (
-                    <div>{s}</div>
+                  {advocate.specialties.map((s:string, index:number) => (
+                    <div key={`${advocate.id}-${index}`}>{s}</div>
                   ))}
                 </td>
                 <td>{advocate.yearsOfExperience}</td>
